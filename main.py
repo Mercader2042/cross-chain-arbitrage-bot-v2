@@ -55,4 +55,5 @@ def get_mexc_spot_balance():
 
 # Ejecutar la función y enviar resultado a Telegram
 result = get_mexc_spot_balance()
+print("Resultado conexión MEXC:", result)  # <--- Esta línea es nueva
 bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"Resultado conexión MEXC:\n{result}")
