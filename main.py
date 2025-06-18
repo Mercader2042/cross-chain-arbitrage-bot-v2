@@ -1,22 +1,52 @@
 import os
+import requests
 import time
+import hmac
+import hashlib
+import base64
+import json
+
 from telegram import Bot
 
-# Leer variables de entorno
+# Telegram
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-
-if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-    raise Exception("Las variables de entorno TELEGRAM_TOKEN o TELEGRAM_CHAT_ID no están definidas")
-
-# Crear bot
 bot = Bot(token=TELEGRAM_TOKEN)
 
-# Enviar mensaje de inicio para test
-bot.send_message(chat_id=TELEGRAM_CHAT_ID, text="Bot iniciado y funcionando correctamente!")
+# MEXC
+API_KEY = os.getenv("MEXC_API_KEY")
+API_SECRET = os.getenv("MEXC_API_SECRET")
 
-# Mantener el bot activo (ejemplo simple)
-while True:
-    # Aquí puedes poner la lógica del bot o esperar
-    time.sleep(60)
+def get_mexc_spot_balance():
+    base_url = "https://api.mexc.com"
+    endpoint = "/api/v3/account"
+    url = base_url + endpoint
+
+    timestamp = int(time.time() * 1000)
+    query_string = f"timestamp={timestamp}"
+
+    signature = hmac.new(
+        API_SECRET.encode('utf-8'),
+        query_string.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+
+    headers = {
+        "X-MEXC-APIKEY": API_KEY
+    }
+
+    response = requests.get(f"{url}?{query_string}&signature={signature}", headers=headers)
+
+    if response.status_code == 200:
+        balances = response.json().get("balances", [])
+        return balances
+    else:
+        return f"Error {response.status_code}: {response.text}"
+
+# Ejecutamos al arrancar
+result = get_mexc_spot_balance()
+
+# Mandamos resultado a Telegram
+bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"Resultado conexión MEXC:\n{result}")
+
 
