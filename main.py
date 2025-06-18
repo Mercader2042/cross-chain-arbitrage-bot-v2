@@ -5,23 +5,27 @@ import hmac
 import hashlib
 from telegram import Bot
 
-# Telegram
+# Leer variables de entorno
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-
-if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-    raise ValueError("Falta TELEGRAM_TOKEN o TELEGRAM_CHAT_ID en las variables de entorno")
-
-bot = Bot(token=TELEGRAM_TOKEN)
-
-# MEXC
 API_KEY = os.getenv("MEXC_API_KEY")
 API_SECRET = os.getenv("MEXC_API_SECRET")
 
-if not API_KEY or not API_SECRET:
-    raise ValueError("Falta MEXC_API_KEY o MEXC_API_SECRET en las variables de entorno")
+# Mostrar en logs si las variables están bien cargadas
+print("TELEGRAM_TOKEN:", "OK" if TELEGRAM_TOKEN else "NO DEFINIDO")
+print("TELEGRAM_CHAT_ID:", TELEGRAM_CHAT_ID)
+print("MEXC_API_KEY:", API_KEY)
+print("MEXC_API_SECRET existe:", bool(API_SECRET))
 
- def get_mexc_spot_balance():
+# Validar que están todas las variables
+if not all([TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, API_KEY, API_SECRET]):
+    raise ValueError("❌ Alguna variable de entorno no está definida correctamente.")
+
+# Inicializar el bot
+bot = Bot(token=TELEGRAM_TOKEN)
+
+# Función para consultar saldo en MEXC
+def get_mexc_spot_balance():
     base_url = "https://api.mexc.com"
     endpoint = "/api/v3/account"
     url = base_url + endpoint
@@ -49,9 +53,6 @@ if not API_KEY or not API_SECRET:
     except Exception as e:
         return f"Exception during API call: {str(e)}"
 
-
-# Ejecutamos al arrancar
+# Ejecutar la función y enviar resultado a Telegram
 result = get_mexc_spot_balance()
-
-# Mandamos resultado a Telegram
 bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"Resultado conexión MEXC:\n{result}")
