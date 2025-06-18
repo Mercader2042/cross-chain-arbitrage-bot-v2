@@ -21,10 +21,7 @@ API_SECRET = os.getenv("MEXC_API_SECRET")
 if not API_KEY or not API_SECRET:
     raise ValueError("Falta MEXC_API_KEY o MEXC_API_SECRET en las variables de entorno")
 
-def get_mexc_spot_balance():
-    print("API_KEY:", API_KEY)
-print("API_SECRET exists:", bool(API_SECRET))
-
+ def get_mexc_spot_balance():
     base_url = "https://api.mexc.com"
     endpoint = "/api/v3/account"
     url = base_url + endpoint
@@ -51,6 +48,7 @@ print("API_SECRET exists:", bool(API_SECRET))
             return f"Error {response.status_code}: {response.text}"
     except Exception as e:
         return f"Exception during API call: {str(e)}"
+
 
 # Ejecutamos al arrancar
 result = get_mexc_spot_balance()
