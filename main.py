@@ -22,6 +22,9 @@ if not API_KEY or not API_SECRET:
     raise ValueError("Falta MEXC_API_KEY o MEXC_API_SECRET en las variables de entorno")
 
 def get_mexc_spot_balance():
+    print("API_KEY:", API_KEY)
+print("API_SECRET exists:", bool(API_SECRET))
+
     base_url = "https://api.mexc.com"
     endpoint = "/api/v3/account"
     url = base_url + endpoint
