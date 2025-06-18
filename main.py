@@ -1,29 +1,22 @@
-import os, time, requests, schedule
+import os
+import time
 from telegram import Bot
 
+# Leer variables de entorno
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+    raise Exception("Las variables de entorno TELEGRAM_TOKEN o TELEGRAM_CHAT_ID no están definidas")
+
+# Crear bot
 bot = Bot(token=TELEGRAM_TOKEN)
 
-PAIRS = ["STEEM", "TRX", "XLM", "DASH", "XNO", "XRP", "ATOM"]
-MIN_MARGIN = 1.5  # porcentaje mínimo
+# Enviar mensaje de inicio para test
+bot.send_message(chat_id=TELEGRAM_CHAT_ID, text="Bot iniciado y funcionando correctamente!")
 
-def check_opportunities():
-    try:
-        # Aquí iría la lógica real de arbitraje cross-chain
-        margin = 2.0  # ejemplo simulado
-        if margin >= MIN_MARGIN:
-            bot.send_message(chat_id=CHAT_ID,
-                             text=f"📈 Oportunidad detectada: margen de {margin:.2f}%")
-        print("[DEBUG] Comprobación realizada.")
-    except Exception as e:
-        bot.send_message(chat_id=CHAT_ID,
-                         text=f"⚠️ Error en check_opportunities:\n{e}")
+# Mantener el bot activo (ejemplo simple)
+while True:
+    # Aquí puedes poner la lógica del bot o esperar
+    time.sleep(60)
 
-schedule.every(30).minutes.do(lambda: bot.send_message(chat_id=CHAT_ID, text="✅ Ping debug"))
-schedule.every(1).minutes.do(check_opportunities)
-
-if __name__ == "__main__":
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
